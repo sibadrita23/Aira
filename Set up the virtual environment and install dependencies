@@ -1,0 +1,4 @@
+python -m venv venv
+source venv/bin/activate  # On Windows, use: venv\Scripts\activate
+pip install nltk spacy scikit-learn numpy
+pip freeze > requirements.txt
