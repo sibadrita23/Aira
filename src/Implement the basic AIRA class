@@ -1,0 +1,49 @@
+import nltk
+import spacy
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+
+class AIRA:
+    def __init__(self):
+        nltk.download('punkt')
+        self.nlp = spacy.load('en_core_web_sm')
+        self.vectorizer = TfidfVectorizer()
+        self.responses = {
+            "greeting": ["Hello!", "Hi there!", "Greetings!"],
+            "farewell": ["Goodbye!", "See you later!", "Take care!"],
+            "thanks": ["You're welcome!", "My pleasure!", "Glad I could help!"],
+            "unknown": ["I'm not sure about that.", "Could you please rephrase?", "I don't understand."]
+        }
+
+    def preprocess(self, text):
+        doc = self.nlp(text.lower())
+        return ' '.join([token.lemma_ for token in doc if not token.is_stop and token.is_alpha])
+
+    def get_response(self, user_input):
+        preprocessed_input = self.preprocess(user_input)
+        
+        # Check for simple matches
+        if any(word in preprocessed_input for word in ['hello', 'hi', 'hey']):
+            return np.random.choice(self.responses["greeting"])
+        elif any(word in preprocessed_input for word in ['bye', 'goodbye']):
+            return np.random.choice(self.responses["farewell"])
+        elif 'thank' in preprocessed_input:
+            return np.random.choice(self.responses["thanks"])
+        
+        # If no simple match, return unknown response
+        return np.random.choice(self.responses["unknown"])
+
+    def chat(self):
+        print("AIRA: Hello! I'm AIRA. How can I assist you today?")
+        while True:
+            user_input = input("You: ")
+            if user_input.lower() in ['quit', 'exit', 'bye']:
+                print("AIRA: Goodbye! Have a great day!")
+                break
+            response = self.get_response(user_input)
+            print(f"AIRA: {response}")
+
+if __name__ == "__main__":
+    aira = AIRA()
+    aira.chat()
